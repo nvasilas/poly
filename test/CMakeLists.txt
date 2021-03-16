@@ -1,0 +1,11 @@
+find_package(GTest REQUIRED)
+
+add_executable(test_polynomial test_polynomial.cpp)
+target_link_libraries(test_polynomial GTest::gtest GTest::gtest_main)
+target_compile_features(test_polynomial PRIVATE cxx_std_17)
+gtest_discover_tests(test_polynomial)
+
+add_executable(test_polynomial_matrix test_polynomial_matrix.cpp)
+target_link_libraries(test_polynomial_matrix GTest::gtest GTest::gtest_main)
+target_compile_features(test_polynomial_matrix PRIVATE cxx_std_17)
+gtest_discover_tests(test_polynomial_matrix)
