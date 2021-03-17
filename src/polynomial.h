@@ -8,7 +8,7 @@
 #include <vector>
 #include <cmath>
 
-namespace {
+namespace poly {
 template<typename T> class Polynomial
 {
     using CoeffType = std::vector<T>;

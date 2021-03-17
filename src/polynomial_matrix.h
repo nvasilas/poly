@@ -9,7 +9,7 @@
 
 #include "polynomial.h"
 
-namespace {
+namespace poly {
 template<typename T> class PolynomialMatrix
 {
   public:
@@ -217,5 +217,5 @@ std::ostream &operator<<(std::ostream &os, const PolynomialMatrix<T> &poly_mat)
     return os;
 }
 
-}// namespace
+}// namespace poly
 #endif// POLYNOMIAL_MATRIX_H

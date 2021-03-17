@@ -1,6 +1,8 @@
 #include "../src/polynomial.h"
 #include "gtest/gtest.h"
 
+using namespace poly;
+
 TEST(TestPolynomial, operator_equal_int)
 {
     Polynomial<int> p1({1, 4});

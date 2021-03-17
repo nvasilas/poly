@@ -1,6 +1,8 @@
 #include "../src/polynomial_matrix.h"
 #include "gtest/gtest.h"
 
+using namespace poly;
+
 const Polynomial<int> p1({ 1, 4, -3, 2 });
 const Polynomial<int> p2({ -1, 2 });
 const auto p3 = p1 + p2;

@@ -4,6 +4,8 @@
 #include <iostream>
 #include <vector>
 
+using namespace poly;
+
 int main()
 {
     // Create a third degree polynomial: 1x^3 + 4x^2 - 3x + 2
@@ -24,9 +26,9 @@ int main()
     auto m3 = m1 * m2;
 
     PolynomialMatrix<int> m(3, 2, {
-                            {1, 0, -7, 6}, {0, 0},
+                            {1, 0, -7, 6}, {0},
                             {1, -1, -4, 4}, {1, 0},
-                            {0, 1, 5, 6}, {0, 0}
+                            {1, 5, 6}, {0}
                             });
     std::cout << m << std::endl;
 
