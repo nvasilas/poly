@@ -152,6 +152,16 @@ template<typename T> class PolynomialMatrix
     auto &operator[](std::size_t idx) { return poly_vec[idx]; }
     const auto &operator[](std::size_t idx) const { return poly_vec[idx]; }
 
+    auto max_degree() const
+    {
+        return std::max_element(poly_vec.cbegin(),
+            poly_vec.cend(),
+            [](const auto &lhs, const auto &rhs) {
+                return lhs.degree() < rhs.degree();
+            })
+            ->degree();
+    }
+
     auto size() const { return poly_vec.size(); }
     auto get_rows() const { return rows; }
     auto get_cols() const { return cols; }

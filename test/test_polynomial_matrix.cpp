@@ -4,7 +4,7 @@
 const Polynomial<int> p1({ 1, 4, -3, 2 });
 const Polynomial<int> p2({ -1, 2 });
 const auto p3 = p1 + p2;
-const Polynomial<int> p4({ 3, -5, 0, 1 });
+const Polynomial<int> p4({ 3, -5, 0, 1, 6 });
 
 TEST(TestPolynomialMatrix, constructor_rows_cols_size)
 {
@@ -160,4 +160,10 @@ TEST(TestPolynomialMatrix, operator_eval)
     PolynomialMatrix<int>::EvalType expected_2 = {20, 20, 0, 20};
     ASSERT_EQ(m(0), expected_0);
     ASSERT_EQ(m(2), expected_2);
+}
+
+TEST(TestPolynomialMatrix, max_degree)
+{
+    PolynomialMatrix<int> m(2, { p1, p4, p2, p1 });
+    ASSERT_EQ(m.max_degree(), 4);
 }

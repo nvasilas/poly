@@ -18,7 +18,7 @@ template<typename T> class Polynomial
     explicit Polynomial(const std::vector<T> &coeff_) : coeff(coeff_) {}
     explicit Polynomial(std::vector<T> &&coeff_) : coeff(std::move(coeff_)) {}
     Polynomial(const T c[], std::size_t deg) : coeff(c, c + deg + 1) {}
-    explicit Polynomial(std::initializer_list<T> l) : coeff(l) {}
+    Polynomial(std::initializer_list<T> l) : coeff(l) {}
 
     Polynomial(const Polynomial &) = default;
     Polynomial(Polynomial &&) = default;
