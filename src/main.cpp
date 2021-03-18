@@ -30,7 +30,12 @@ int main()
                             {1, -1, -4, 4}, {1, 0},
                             {1, 5, 6}, {0}
                             });
-    std::cout << m << std::endl;
+    // auto mat = m.to_matrix();
+    // for (auto i : mat)
+    //     std::cout << i << std::endl;
+    auto mat_coeff = m.to_coeff_matrix();
+    for (auto i : mat_coeff)
+        std::cout << i << std::endl;
 
     return 0;
 }

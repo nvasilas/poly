@@ -15,10 +15,10 @@ template<typename T> class Polynomial
 
   public:
     Polynomial() = default;
-    explicit Polynomial(const std::vector<T> &coeff_) : coeff(coeff_) {}
-    explicit Polynomial(std::vector<T> &&coeff_) : coeff(std::move(coeff_)) {}
-    Polynomial(const T c[], std::size_t deg) : coeff(c, c + deg + 1) {}
-    Polynomial(std::initializer_list<T> l) : coeff(l) {}
+    explicit Polynomial(const std::vector<T> &coeff_) : m_coeff(coeff_) {}
+    explicit Polynomial(std::vector<T> &&coeff_) : m_coeff(std::move(coeff_)) {}
+    Polynomial(const T c[], std::size_t deg) : m_coeff(c, c + deg + 1) {}
+    Polynomial(std::initializer_list<T> init) : m_coeff(init) {}
 
     Polynomial(const Polynomial &) = default;
     Polynomial(Polynomial &&) = default;
@@ -29,21 +29,21 @@ template<typename T> class Polynomial
 
     Polynomial &operator+=(const Polynomial &other)
     {
-        const auto &[small, large] = std::minmax(coeff,
-            other.coeff,
+        const auto &[small, large] = std::minmax(m_coeff,
+            other.m_coeff,
             [](const auto &a, const auto &b) { return a.size() < b.size(); });
 
         auto result = large;
         auto it = result.begin();
         std::advance(it, large.size() - small.size());
         std::transform(small.cbegin(), small.cend(), it, it, std::plus<>{});
-        coeff = std::move(result);
+        m_coeff = std::move(result);
         return *this;
     }
 
     Polynomial &operator-=(const Polynomial &other)
     {
-        auto result(other.coeff);
+        auto result(other.m_coeff);
         std::transform(
             result.cbegin(), result.cend(), result.begin(), std::negate<>{});
         *this += Polynomial{ std::move(result) };
@@ -55,15 +55,15 @@ template<typename T> class Polynomial
         CoeffType result(degree() + other.degree() + 1);
         for (std::size_t i = 0; i <= degree(); ++i)
             for (std::size_t j = 0; j <= other.degree(); ++j)
-                result[i + j] += coeff[i] * other[j];
-        coeff = std::move(result);
+                result[i + j] += m_coeff[i] * other[j];
+        m_coeff = std::move(result);
         return *this;
     }
 
     Polynomial &operator*=(const T val)
     {
         std::transform(
-            coeff.cbegin(), coeff.cend(), coeff.begin(), [val](auto i) {
+            m_coeff.cbegin(), m_coeff.cend(), m_coeff.begin(), [val](auto i) {
                 return i * val;
             });
         return *this;
@@ -72,26 +72,26 @@ template<typename T> class Polynomial
     auto operator()(const T x) const
     {
         T result{};
-        for (auto i : coeff) result = result * x + i;
+        for (auto i : m_coeff) result = result * x + i;
         return result;
     }
 
-    auto &operator[](std::size_t idx) { return coeff[idx]; }
-    const auto &operator[](std::size_t idx) const { return coeff[idx]; }
+    auto &operator[](std::size_t idx) { return m_coeff[idx]; }
+    const auto &operator[](std::size_t idx) const { return m_coeff[idx]; }
 
-    auto degree() const { return coeff.size() - 1; }
-    auto &coefficients() const { return coeff; };
+    auto degree() const { return m_coeff.size() - 1; }
+    auto &coefficients() const { return m_coeff; };
 
   private:
-    // coeff[0] * x ** deg + coeff[1] * x ** (deg-1) + ... + coeff.back()
-    CoeffType coeff;
+    // m_coeff[0] * x ** deg + m_coeff[1] * x ** (deg-1) + ... + m_coeff.back()
+    CoeffType m_coeff;
 };
 
 template<typename T>
 inline auto operator==(const Polynomial<T> &lhs, const Polynomial<T> &rhs)
 {
     if constexpr (std::is_floating_point_v<T>)
-        // return coeff == other.coeff;
+        // return m_coeff == other.m_coeff;
         return std::equal(lhs.coefficients().cbegin(),
             lhs.coefficients().cend(),
             rhs.coefficients().cbegin(),
@@ -161,5 +161,5 @@ std::ostream &operator<<(std::ostream &os, const Polynomial<T> &poly)
     return os;
 }
 
-}// namespace
+}// namespace poly
 #endif// POLYNOMIAL_H
