@@ -91,12 +91,31 @@ TEST(TestPolynomial, operator_multiply_poly)
     ASSERT_EQ(expected, p2 * p1);
 }
 
+TEST(TestPolynomial, operator_multiply_poly_constant_poly)
+{
+    Polynomial<int> p1({1, 4, -3, 2});
+    Polynomial<int> p2({-1});
+    Polynomial<int> expected({-1, -4, 3, -2});
+    ASSERT_EQ(p1 * p2, expected);
+    ASSERT_EQ(expected, p2 * p1);
+}
+
 TEST(TestPolynomial, operator_compound_multiply_poly)
 {
     Polynomial<int> p1({1, 4, -3, 2});
     Polynomial<int> p2({-1, 2});
     p1 *= p2;
     Polynomial<int> expected({-1, -2, 11, -8, 4});
+    ASSERT_EQ(p1, expected);
+    ASSERT_EQ(expected, p1);
+}
+
+TEST(TestPolynomial, operator_compound_multiply_poly_constant_poly)
+{
+    Polynomial<int> p1({1, 4, -3, 2});
+    Polynomial<int> p2({-1});
+    p1 *= p2;
+    Polynomial<int> expected({-1, -4, 3, -2});
     ASSERT_EQ(p1, expected);
     ASSERT_EQ(expected, p1);
 }
