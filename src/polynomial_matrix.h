@@ -158,7 +158,7 @@ template<typename T> class PolynomialMatrix
 
         auto position = mat.begin();
         for (const auto &poly : m_vec) {
-            std::reverse_copy(poly.coefficients().cbegin(),
+            std::copy(poly.coefficients().cbegin(),
                 poly.coefficients().cend(),
                 position);
             std::advance(position, max_col);

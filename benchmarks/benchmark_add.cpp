@@ -2,8 +2,8 @@
 #include <benchmark/benchmark.h>
 #include <vector>
 
-const std::vector<int> v1(100, 10);
-const std::vector<int> v2(800, -1);
+const std::vector<int> v1(1000, 10);
+const std::vector<int> v2(8000, -1);
 
 static void BM_add_transform(benchmark::State &state)
 {
@@ -40,5 +40,19 @@ static void BM_add_loop(benchmark::State &state)
     }
 }
 BENCHMARK(BM_add_loop);
+
+static void BM_add_loop_resize(benchmark::State &state)
+{
+    const auto value = v2;
+    for (auto _ : state) {
+        auto result(v1);
+        if (result.size() < value.size())
+            result.resize(value.size(), 0);
+        for (std::size_t i = 0; i < value.size(); ++i)
+            result[i] = result[i] + value[i];
+        benchmark::DoNotOptimize(result.data());
+    }
+}
+BENCHMARK(BM_add_loop_resize);
 
 BENCHMARK_MAIN();

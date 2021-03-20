@@ -32,15 +32,16 @@ TEST(TestPolynomial, operator_not_equal)
 TEST(TestPolynomial, operator_eval)
 {
     Polynomial<int> p({1, 4, -3, 2});
-    ASSERT_EQ(p(0), 2);
-    ASSERT_EQ(p(3), 56);
+    ASSERT_EQ(p(0), 1);
+    ASSERT_EQ(p(3), 40);
+    ASSERT_EQ(p(10), 1741);
 }
 
 TEST(TestPolynomial, operator_plus)
 {
     Polynomial<int> p1({1, 4, -3, 2});
     Polynomial<int> p2({-1, 2});
-    Polynomial<int> expected({1, 4, -4, 4});
+    Polynomial<int> expected({0, 6, -3, 2});
     ASSERT_EQ(p1 + p2, expected);
     ASSERT_EQ(expected, p2 + p1);
 }
@@ -50,7 +51,7 @@ TEST(TestPolynomial, operator_compound_plus)
     Polynomial<int> p1({1, 4, -3, 2});
     Polynomial<int> p2({-1, 2});
     p1 += p2;
-    Polynomial<int> expected({1, 4, -4, 4});
+    Polynomial<int> expected({0, 6, -3, 2});
     ASSERT_EQ(p1, expected);
 }
 
@@ -58,12 +59,12 @@ TEST(TestPolynomial, operator_minus)
 {
     Polynomial<int> p1({1, 4, -3, 2});
     Polynomial<int> p2({-1, 2});
-    Polynomial<int> expected({1, 4, -2, 0});
+    Polynomial<int> expected({2, 2, -3, 2});
     ASSERT_EQ(p1 - p2, expected);
 
     Polynomial<int> p3({-1, 2});
     Polynomial<int> p4({1, 4, -3, 2});
-    Polynomial<int> expected2({-1, -4, 2, 0});
+    Polynomial<int> expected2({-2, -2, 3, -2});
     ASSERT_EQ(p3 - p4, expected2);
 }
 
@@ -72,13 +73,13 @@ TEST(TestPolynomial, operator_compound_minus)
     Polynomial<int> p1({1, 4, -3, 2});
     Polynomial<int> p2({-1, 2});
     p1 -= p2;
-    Polynomial<int> expected({1, 4, -2, 0});
+    Polynomial<int> expected({2, 2, -3, 2});
     ASSERT_EQ(p1, expected);
 
     Polynomial<int> p3({-1, 2});
     Polynomial<int> p4({1, 4, -3, 2});
     p3 -= p4;
-    Polynomial<int> expected2({-1, -4, 2, 0});
+    Polynomial<int> expected2({-2, -2, 3, -2});
     ASSERT_EQ(p3, expected2);
 }
 
@@ -151,24 +152,24 @@ TEST(TestPolynomial, test_degree)
 
 TEST(TestPolynomial, divide)
 {
-    Polynomial<int> N = {2, 7, 4, 9};
-    Polynomial<int> D = {1, 0, 1};
+    Polynomial<double> N = {9, 4, 7, 2};
+    Polynomial<double> D = {1, 0, 1};
     auto [quotient, remainder] = divide(N, D);
     ASSERT_EQ(D * quotient + remainder, N);
 }
 
 TEST(TestPolynomial, operator_divide_remainder)
 {
-    Polynomial<int> N = {2, 7, 4, 9};
-    Polynomial<int> D = {1, 0, 1};
-    Polynomial<int> remainder({2, 2});
+    Polynomial<double> N = {9, 4, 7, 2};
+    Polynomial<double> D = {1, 0, 1};
+    Polynomial<double> remainder({2, 2});
     ASSERT_EQ(N / D, remainder);
 }
 
 TEST(TestPolynomial, operator_divide_quotient)
 {
-    Polynomial<int> N = {2, 7, 4, 9};
-    Polynomial<int> D = {1, 0, 1};
-    Polynomial<int> quotient({2, 7});
+    Polynomial<double> N = {9, 4, 7, 2};
+    Polynomial<double> D = {1, 0, 1};
+    Polynomial<double> quotient({7, 2});
     ASSERT_EQ(N % D, quotient);
 }

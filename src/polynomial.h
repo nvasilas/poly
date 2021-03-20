@@ -40,9 +40,11 @@ template<typename T> class Polynomial
             [](const auto &a, const auto &b) { return a.size() < b.size(); });
 
         auto result = large;
-        auto it = result.begin();
-        std::advance(it, large.size() - small.size());
-        std::transform(small.cbegin(), small.cend(), it, it, std::plus<>{});
+        std::transform(small.cbegin(),
+            small.cend(),
+            result.cbegin(),
+            result.begin(),
+            std::plus<>{});
         m_coeff = std::move(result);
         return *this;
     }
@@ -78,8 +80,9 @@ template<typename T> class Polynomial
     template<typename X> auto operator()(const X x) const
     {
         static_assert(std::is_arithmetic<X>::value, "Not an arithmetic type");
-        X result{};
-        for (auto i : m_coeff) result = result * x + i;
+        auto rit = std::rbegin(m_coeff);
+        auto result(*rit++);
+        for (; rit != std::rend(m_coeff); ++rit) result = result * x + *rit;
         return result;
     }
 
@@ -91,7 +94,7 @@ template<typename T> class Polynomial
     auto &coefficients() const { return m_coeff; };
 
   private:
-    // m_coeff[0] * x ** deg + m_coeff[1] * x ** (deg-1) + ... + m_coeff.back()
+    // m_coeff[0] + m_coeff[1] * x + ... + m_coeff.back() * x ** deg
     CoeffType m_coeff;
 };
 
@@ -211,19 +214,27 @@ auto divide(const Polynomial<T> &dividend, const Polynomial<T> &divisor)
 
     using CoeffType = typename Polynomial<T>::CoeffType;
     CoeffType remainder = dividend.coefficients();
-    CoeffType quotient(size_dividend - size_divisor + 1);
-    for (std::size_t lead_coeff = 0; lead_coeff < quotient.size();
-         ++lead_coeff) {
-        const auto quo = remainder[lead_coeff] / divisor[0];
-        quotient[lead_coeff] = quo;
-        remainder[lead_coeff] = 0;
-        for (std::size_t k = 1; k < size_divisor; ++k)
-            remainder[k + lead_coeff] -= quo * divisor[k];
+    const auto quotient_size = size_dividend - size_divisor + 1;
+    CoeffType quotient(quotient_size);
+
+    auto lead_coeff_r = remainder.size() - 1;
+    std::size_t outer = 0;
+    for (std::size_t lead_coeff_q = quotient_size - 1; outer < quotient_size;
+         ++outer, --lead_coeff_q) {
+        const auto quo = remainder[lead_coeff_r] / divisor[size_divisor - 1];
+        quotient[lead_coeff_q] = quo;
+        remainder[lead_coeff_r] = 0;
+        std::size_t inner = 0;
+        for (std::size_t k = size_divisor - 2; inner < size_divisor - 1;
+             ++inner, --k)
+            remainder[k + lead_coeff_q] -= quo * divisor[k];
+        --lead_coeff_r;
     }
-    remainder.erase(remainder.begin(),
-        std::find_if(remainder.cbegin(), remainder.cend(), [](T v) {
-            return v != T(0);
-        }));
+    remainder.erase(
+        std::find_if(
+            remainder.rbegin(), remainder.rend(), [](T v) { return v != T(0); })
+            .base(),
+        remainder.end());
     return std::make_pair(Polynomial<T>{ std::move(quotient) },
         Polynomial<T>{ std::move(remainder) });
 }
