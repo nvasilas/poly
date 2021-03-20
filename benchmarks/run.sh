@@ -1,5 +1,5 @@
 #!/bin/bash
 
 sudo cpupower frequency-set --governor performance > /dev/null
-./benchmark_polynomial_add
+./$1
 sudo cpupower frequency-set --governor powersave > /dev/null

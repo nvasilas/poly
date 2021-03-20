@@ -148,3 +148,27 @@ TEST(TestPolynomial, test_degree)
     Polynomial<int> p({1, 4, -3, 2});
     ASSERT_EQ(p.degree(), 3);
 }
+
+TEST(TestPolynomial, divide)
+{
+    Polynomial<int> N = {2, 7, 4, 9};
+    Polynomial<int> D = {1, 0, 1};
+    auto [quotient, remainder] = divide(N, D);
+    ASSERT_EQ(D * quotient + remainder, N);
+}
+
+TEST(TestPolynomial, operator_divide_remainder)
+{
+    Polynomial<int> N = {2, 7, 4, 9};
+    Polynomial<int> D = {1, 0, 1};
+    Polynomial<int> remainder({2, 2});
+    ASSERT_EQ(N / D, remainder);
+}
+
+TEST(TestPolynomial, operator_divide_quotient)
+{
+    Polynomial<int> N = {2, 7, 4, 9};
+    Polynomial<int> D = {1, 0, 1};
+    Polynomial<int> quotient({2, 7});
+    ASSERT_EQ(N % D, quotient);
+}
