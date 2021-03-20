@@ -1,15 +1,15 @@
 #ifndef POLYNOMIAL_H
 #define POLYNOMIAL_H
 
-#include <type_traits>
 #include <algorithm>
+#include <cmath>
 #include <iostream>
 #include <iterator>
+#include <type_traits>
 #include <vector>
-#include <cmath>
 
 namespace poly {
-template<typename T> class Polynomial
+template <typename T> class Polynomial
 {
   public:
     using CoeffType = std::vector<T>;
@@ -35,26 +35,19 @@ template<typename T> class Polynomial
 
     Polynomial &operator+=(const Polynomial &other)
     {
-        const auto &[small, large] = std::minmax(m_coeff,
-            other.m_coeff,
-            [](const auto &a, const auto &b) { return a.size() < b.size(); });
-
-        auto result = large;
-        std::transform(small.cbegin(),
-            small.cend(),
-            result.cbegin(),
-            result.begin(),
-            std::plus<>{});
-        m_coeff = std::move(result);
+        if (m_coeff.size() < other.size())
+            m_coeff.resize(other.size(), T{});
+        for (std::size_t i = 0; i < other.size(); ++i)
+            m_coeff[i] += other[i];
         return *this;
     }
 
     Polynomial &operator-=(const Polynomial &other)
     {
-        auto result(other.m_coeff);
-        std::transform(
-            result.cbegin(), result.cend(), result.begin(), std::negate<>{});
-        *this += Polynomial{ std::move(result) };
+        if (m_coeff.size() < other.size())
+            m_coeff.resize(other.size(), T{});
+        for (std::size_t i = 0; i < other.size(); ++i)
+            m_coeff[i] -= other[i];
         return *this;
     }
 
@@ -70,126 +63,84 @@ template<typename T> class Polynomial
 
     Polynomial &operator*=(const T val)
     {
-        std::transform(
-            m_coeff.cbegin(), m_coeff.cend(), m_coeff.begin(), [val](auto i) {
-                return i * val;
-            });
+        std::transform(m_coeff.cbegin(), m_coeff.cend(), m_coeff.begin(),
+                       [val](auto i) { return i * val; });
         return *this;
     }
 
-    template<typename X> auto operator()(const X x) const
+    template <typename X> auto operator()(const X x) const
     {
         static_assert(std::is_arithmetic<X>::value, "Not an arithmetic type");
         auto rit = std::rbegin(m_coeff);
         auto result(*rit++);
-        for (; rit != std::rend(m_coeff); ++rit) result = result * x + *rit;
+        for (; rit != std::rend(m_coeff); ++rit)
+            result = result * x + *rit;
         return result;
     }
+
+    void swap(Polynomial &other) noexcept { m_coeff.swap(other.m_coeff); }
 
     auto &operator[](std::size_t idx) { return m_coeff[idx]; }
     const auto &operator[](std::size_t idx) const { return m_coeff[idx]; }
 
-    auto size() const { return m_coeff.size(); }
-    auto degree() const { return m_coeff.size() - 1; }
-    auto &coefficients() const { return m_coeff; };
+    auto size() const noexcept { return m_coeff.size(); }
+    auto degree() const noexcept { return m_coeff.size() - 1; }
+    auto &coefficients() const noexcept { return m_coeff; };
 
   private:
     // m_coeff[0] + m_coeff[1] * x + ... + m_coeff.back() * x ** deg
     CoeffType m_coeff;
 };
 
-template<typename T>
+template <typename T>
 inline auto operator==(const Polynomial<T> &lhs, const Polynomial<T> &rhs)
 {
     if constexpr (std::is_floating_point_v<T>)
         // return lhs.coefficients() == rhs.coefficients();
         return std::equal(lhs.coefficients().cbegin(),
-            lhs.coefficients().cend(),
-            rhs.coefficients().cbegin(),
-            [](T x, T y) {
-                constexpr double epsilon = 1e-6;
-                return std::fabs(x - y) < epsilon;
-            });
+                          lhs.coefficients().cend(),
+                          rhs.coefficients().cbegin(), [](T x, T y) {
+                              constexpr double epsilon = 1e-6;
+                              return std::fabs(x - y) < epsilon;
+                          });
     else
         return lhs.coefficients() == rhs.coefficients();
 }
 
-template<typename T>
+template <typename T>
 inline auto operator!=(const Polynomial<T> &lhs, const Polynomial<T> &rhs)
 {
     return !(lhs == rhs);
 }
 
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator+(const Polynomial<T> &lhs,
-    const Polynomial<T> &rhs)
+                               const Polynomial<T> &rhs)
 {
     auto ret(lhs);
     ret += rhs;
     return ret;
 }
 
-template<typename T>
-inline Polynomial<T> operator+(Polynomial<T> &&lhs, const Polynomial<T> &rhs)
-{
-    lhs += rhs;
-    return lhs;
-}
-
-template<typename T>
-inline Polynomial<T> operator+(const Polynomial<T> &lhs, Polynomial<T> &&rhs)
-{
-    rhs += lhs;
-    return rhs;
-}
-
-template<typename T>
-inline Polynomial<T> operator+(Polynomial<T> &&lhs, Polynomial<T> &&rhs)
-{
-    lhs += rhs;
-    return lhs;
-}
-
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator-(const Polynomial<T> &lhs,
-    const Polynomial<T> &rhs)
+                               const Polynomial<T> &rhs)
 {
     auto ret(lhs);
     ret -= rhs;
     return ret;
 }
 
-template<typename T>
-inline Polynomial<T> operator-(Polynomial<T> &&lhs, const Polynomial<T> &rhs)
-{
-    lhs -= rhs;
-    return lhs;
-}
-
-template<typename T>
-inline Polynomial<T> operator-(const Polynomial<T> &lhs, Polynomial<T> &&rhs)
-{
-    rhs -= lhs;
-    return rhs;
-}
-
-template<typename T>
-inline Polynomial<T> operator-(Polynomial<T> &&lhs, Polynomial<T> &&rhs)
-{
-    lhs -= rhs;
-    return lhs;
-}
-
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator*(const Polynomial<T> &lhs,
-    const Polynomial<T> &rhs)
+                               const Polynomial<T> &rhs)
 {
     auto ret(lhs);
     ret *= rhs;
     return ret;
 }
 
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator*(const Polynomial<T> &lhs, const T val)
 {
     auto ret(lhs);
@@ -197,13 +148,13 @@ inline Polynomial<T> operator*(const Polynomial<T> &lhs, const T val)
     return ret;
 }
 
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator*(const T val, const Polynomial<T> &rhs)
 {
     return rhs * val;
 }
 
-template<typename T>
+template <typename T>
 auto divide(const Polynomial<T> &dividend, const Polynomial<T> &divisor)
 {
     const auto size_dividend = dividend.size();
@@ -230,39 +181,37 @@ auto divide(const Polynomial<T> &dividend, const Polynomial<T> &divisor)
             remainder[k + lead_coeff_q] -= quo * divisor[k];
         --lead_coeff_r;
     }
-    remainder.erase(
-        std::find_if(
-            remainder.rbegin(), remainder.rend(), [](T v) { return v != T(0); })
-            .base(),
-        remainder.end());
-    return std::make_pair(Polynomial<T>{ std::move(quotient) },
-        Polynomial<T>{ std::move(remainder) });
+    remainder.erase(std::find_if(remainder.rbegin(), remainder.rend(),
+                                 [](T v) { return v != T(0); })
+                        .base(),
+                    remainder.end());
+    return std::make_pair(Polynomial<T>{std::move(quotient)},
+                          Polynomial<T>{std::move(remainder)});
 }
 
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator/(const Polynomial<T> &lhs,
-    const Polynomial<T> &rhs)
+                               const Polynomial<T> &rhs)
 {
     return divide(lhs, rhs).second;
 }
 
-template<typename T>
+template <typename T>
 inline Polynomial<T> operator%(const Polynomial<T> &lhs,
-    const Polynomial<T> &rhs)
+                               const Polynomial<T> &rhs)
 {
     return divide(lhs, rhs).first;
 }
 
-template<typename T>
+template <typename T>
 std::ostream &operator<<(std::ostream &os, const Polynomial<T> &poly)
 {
     const auto coeff = poly.coefficients();
-    std::copy(std::begin(coeff),
-        std::prev(std::end(coeff)),
-        std::ostream_iterator<T>(os, ", "));
+    std::copy(std::begin(coeff), std::prev(std::end(coeff)),
+              std::ostream_iterator<T>(os, ", "));
     os << coeff.back();
     return os;
 }
 
-}// namespace poly
-#endif// POLYNOMIAL_H
+} // namespace poly
+#endif // POLYNOMIAL_H

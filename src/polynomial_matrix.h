@@ -10,7 +10,7 @@
 #include "polynomial.h"
 
 namespace poly {
-template<typename T> class PolynomialMatrix
+template <typename T> class PolynomialMatrix
 {
   public:
     PolynomialMatrix() = default;
@@ -18,34 +18,31 @@ template<typename T> class PolynomialMatrix
         : m_rows(rows_), m_cols(cols_), m_vec(rows_ * cols_)
     {}
 
-    PolynomialMatrix(std::size_t rows_,
-        std::size_t cols_,
-        const std::vector<Polynomial<T>> &vec_)
-        : m_rows(rows_), m_cols(cols_), m_vec{ vec_ }
+    PolynomialMatrix(std::size_t rows_, std::size_t cols_,
+                     const std::vector<Polynomial<T>> &vec_)
+        : m_rows(rows_), m_cols(cols_), m_vec{vec_}
     {
         if (m_rows * m_cols != m_vec.size())
             throw std::invalid_argument("rows * cols != poly_vec.size()");
     }
 
-    PolynomialMatrix(std::size_t rows_,
-        std::size_t cols_,
-        std::vector<Polynomial<T>> &&vec_)
-        : m_rows(rows_), m_cols(cols_), m_vec{ std::move(vec_) }
+    PolynomialMatrix(std::size_t rows_, std::size_t cols_,
+                     std::vector<Polynomial<T>> &&vec_)
+        : m_rows(rows_), m_cols(cols_), m_vec{std::move(vec_)}
     {
         if (m_rows * m_cols != m_vec.size())
             throw std::invalid_argument("rows * cols != poly_vec.size()");
     }
 
     PolynomialMatrix(std::size_t rows_, const std::vector<Polynomial<T>> &vec_)
-        : PolynomialMatrix(rows_,
-            (vec_.size() / rows_) ? vec_.size() / rows_ : 1,
-            vec_)
+        : PolynomialMatrix(
+              rows_, (vec_.size() / rows_) ? vec_.size() / rows_ : 1, vec_)
     {}
 
     PolynomialMatrix(std::size_t rows_, std::vector<Polynomial<T>> &&vec_)
         : PolynomialMatrix(rows_,
-            (vec_.size() / rows_) ? vec_.size() / rows_ : 1,
-            std::move(vec_))
+                           (vec_.size() / rows_) ? vec_.size() / rows_ : 1,
+                           std::move(vec_))
     {}
 
     PolynomialMatrix(const PolynomialMatrix &) = default;
@@ -61,11 +58,8 @@ template<typename T> class PolynomialMatrix
             throw std::logic_error(
                 "rows and cols must match to add PolynomialMatrices");
 
-        std::transform(m_vec.cbegin(),
-            m_vec.cend(),
-            other.m_vec.cbegin(),
-            m_vec.begin(),
-            std::plus<>{});
+        std::transform(m_vec.cbegin(), m_vec.cend(), other.m_vec.cbegin(),
+                       m_vec.begin(), std::plus<>{});
         return *this;
     }
 
@@ -75,25 +69,20 @@ template<typename T> class PolynomialMatrix
             throw std::logic_error(
                 "rows and cols must match to minus PolynomialMatrices");
 
-        std::transform(m_vec.cbegin(),
-            m_vec.cend(),
-            other.m_vec.cbegin(),
-            m_vec.begin(),
-            std::minus<>{});
+        std::transform(m_vec.cbegin(), m_vec.cend(), other.m_vec.cbegin(),
+                       m_vec.begin(), std::minus<>{});
         return *this;
     }
 
     PolynomialMatrix &operator*=(const T val)
     {
-        std::transform(m_vec.cbegin(),
-            m_vec.cend(),
-            m_vec.begin(),
-            [val](const auto &poly) { return val * poly; });
+        std::transform(m_vec.cbegin(), m_vec.cend(), m_vec.begin(),
+                       [val](const auto &poly) { return val * poly; });
         return *this;
     }
 
     friend PolynomialMatrix operator*(const PolynomialMatrix &lhs,
-        const PolynomialMatrix &rhs)
+                                      const PolynomialMatrix &rhs)
     {
         if (lhs.m_cols != rhs.m_rows)
             throw std::logic_error(
@@ -122,10 +111,8 @@ template<typename T> class PolynomialMatrix
     auto operator()(const T x) const
     {
         std::vector<T> result(m_vec.size());
-        std::transform(m_vec.cbegin(),
-            m_vec.cend(),
-            result.begin(),
-            [x](const auto &poly) { return poly(x); });
+        std::transform(m_vec.cbegin(), m_vec.cend(), result.begin(),
+                       [x](const auto &poly) { return poly(x); });
         return result;
     }
 
@@ -143,11 +130,10 @@ template<typename T> class PolynomialMatrix
 
     auto max_degree() const
     {
-        return std::max_element(m_vec.cbegin(),
-            m_vec.cend(),
-            [](const auto &lhs, const auto &rhs) {
-                return lhs.degree() < rhs.degree();
-            })
+        return std::max_element(m_vec.cbegin(), m_vec.cend(),
+                                [](const auto &lhs, const auto &rhs) {
+                                    return lhs.degree() < rhs.degree();
+                                })
             ->degree();
     }
 
@@ -158,9 +144,8 @@ template<typename T> class PolynomialMatrix
 
         auto position = mat.begin();
         for (const auto &poly : m_vec) {
-            std::copy(poly.coefficients().cbegin(),
-                poly.coefficients().cend(),
-                position);
+            std::copy(poly.coefficients().cbegin(), poly.coefficients().cend(),
+                      position);
             std::advance(position, max_col);
         }
         return mat;
@@ -168,7 +153,8 @@ template<typename T> class PolynomialMatrix
 
     auto to_coeff_matrix() const
     {
-        if (m_rows == 1 || m_cols == 1) return to_matrix();
+        if (m_rows == 1 || m_cols == 1)
+            return to_matrix();
         const auto mat = to_matrix();
         std::vector<int> ret;
         ret.reserve(mat.size());
@@ -195,64 +181,65 @@ template<typename T> class PolynomialMatrix
     std::vector<Polynomial<T>> m_vec;
 };
 
-template<typename T>
+template <typename T>
 inline auto operator==(const PolynomialMatrix<T> &lhs,
-    const PolynomialMatrix<T> &rhs)
+                       const PolynomialMatrix<T> &rhs)
 {
-    return lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols()
-           && lhs.polynomial_vector() == rhs.polynomial_vector();
+    return lhs.rows() == rhs.rows() && lhs.cols() == rhs.cols() &&
+           lhs.polynomial_vector() == rhs.polynomial_vector();
 }
 
-template<typename T>
+template <typename T>
 inline auto operator!=(const PolynomialMatrix<T> &lhs,
-    const PolynomialMatrix<T> &rhs)
+                       const PolynomialMatrix<T> &rhs)
 {
     return !(lhs == rhs);
 }
 
-template<typename T>
+template <typename T>
 inline PolynomialMatrix<T> operator+(const PolynomialMatrix<T> &lhs,
-    const PolynomialMatrix<T> &rhs)
+                                     const PolynomialMatrix<T> &rhs)
 {
     auto ret(lhs);
     ret += rhs;
     return ret;
 }
 
-template<typename T>
+template <typename T>
 inline PolynomialMatrix<T> operator-(const PolynomialMatrix<T> &lhs,
-    const PolynomialMatrix<T> &rhs)
+                                     const PolynomialMatrix<T> &rhs)
 {
     auto ret(lhs);
     ret -= rhs;
     return ret;
 }
 
-template<typename T>
+template <typename T>
 inline PolynomialMatrix<T> operator*(const PolynomialMatrix<T> &lhs,
-    const T val)
+                                     const T val)
 {
     auto ret(lhs);
     ret *= val;
     return ret;
 }
 
-template<typename T>
+template <typename T>
 inline PolynomialMatrix<T> operator*(const T val,
-    const PolynomialMatrix<T> &rhs)
+                                     const PolynomialMatrix<T> &rhs)
 {
     return rhs * val;
 }
 
-template<typename T>
+template <typename T>
 std::ostream &operator<<(std::ostream &os, const PolynomialMatrix<T> &poly_mat)
 {
     for (std::size_t i = 0; i < poly_mat.size(); ++i) {
-        if (i && i % poly_mat.cols() == 0) os << "\n";
+        if (i && i % poly_mat.cols() == 0)
+            os << "\n";
         os << "[ " << poly_mat[i] << " ]";
     }
     return os;
 }
 
-}// namespace poly
-#endif// POLYNOMIAL_MATRIX_H
+} // namespace poly
+#endif // POLYNOMIAL_MATRIX_H
