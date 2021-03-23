@@ -21,7 +21,7 @@ class _Polynomial : public Polynomial<int>
         return rhs;
     }
 
-    auto &coefficients() const noexcept { return m_coeff; };
+    const auto &data() const noexcept { return m_coeff; };
 
   private:
     std::vector<int> m_coeff;
@@ -37,7 +37,7 @@ static void BM_add_lvalues(benchmark::State &state)
         const auto small = Polynomial<int>{vec_small};
 
         auto result = large + small;
-        benchmark::DoNotOptimize(result.coefficients());
+        benchmark::DoNotOptimize(result.data());
     }
 }
 BENCHMARK(BM_add_lvalues);
@@ -49,7 +49,7 @@ static void BM_add_big_rvalue_small_lvalue(benchmark::State &state)
         const auto small = _Polynomial{vec_small};
 
         auto result = std::move(large) + small;
-        benchmark::DoNotOptimize(result.coefficients());
+        benchmark::DoNotOptimize(result.data());
     }
 }
 BENCHMARK(BM_add_big_rvalue_small_lvalue);
@@ -61,7 +61,7 @@ static void BM_add_big_lvalue_small_rvalue(benchmark::State &state)
         auto small = _Polynomial{vec_small};
 
         auto result = large + std::move(small);
-        benchmark::DoNotOptimize(result.coefficients());
+        benchmark::DoNotOptimize(result.data());
     }
 }
 BENCHMARK(BM_add_big_lvalue_small_rvalue);

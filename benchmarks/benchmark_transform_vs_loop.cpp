@@ -31,7 +31,7 @@ class _Polynomial : public Polynomial<int>
         return *this;
     }
 
-    auto &coefficients() const noexcept { return m_coeff; };
+    const auto &data() const noexcept { return m_coeff; };
 
   private:
     std::vector<int> m_coeff;
@@ -46,7 +46,7 @@ static void BM_add_loop(benchmark::State &state)
     const auto p2 = Polynomial<int>{v2};
     for (auto _ : state) {
         p1 += p2;
-        benchmark::DoNotOptimize(p1.coefficients());
+        benchmark::DoNotOptimize(p1.data());
     }
 }
 BENCHMARK(BM_add_loop);
@@ -57,7 +57,7 @@ static void BM_add_transform(benchmark::State &state)
     const auto p2 = _Polynomial{v2};
     for (auto _ : state) {
         p1 += p2;
-        benchmark::DoNotOptimize(p1.coefficients());
+        benchmark::DoNotOptimize(p1.data());
     }
 }
 BENCHMARK(BM_add_transform);
@@ -68,7 +68,7 @@ static void BM_minus_loop(benchmark::State &state)
     const auto p2 = Polynomial<int>{v2};
     for (auto _ : state) {
         p1 -= p2;
-        benchmark::DoNotOptimize(p1.coefficients());
+        benchmark::DoNotOptimize(p1.data());
     }
 }
 BENCHMARK(BM_minus_loop);
@@ -79,7 +79,7 @@ static void BM_minus_transform(benchmark::State &state)
     const auto p2 = _Polynomial{v2};
     for (auto _ : state) {
         p1 -= p2;
-        benchmark::DoNotOptimize(p1.coefficients());
+        benchmark::DoNotOptimize(p1.data());
     }
 }
 BENCHMARK(BM_minus_transform);
