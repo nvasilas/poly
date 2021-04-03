@@ -1,6 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
 project(poly LANGUAGES CXX)
 
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 include(cmake/StandardProjectSettings.cmake)
 include(cmake/PreventInSourceBuilds.cmake)
 
@@ -21,6 +23,16 @@ enable_sanitizers(project_options)
 
 # allow for static analysis options
 include(cmake/StaticAnalyzers.cmake)
+
+find_package(blaze REQUIRED)
+set(BLAZE_FLAGS -mavx)
+if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
+	CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
+    target_compile_options(project_options INTERFACE ${BLAZE_FLAGS})
+else()
+    message(AUTHOR_WARNING
+	"No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")
+endif()
 
 add_subdirectory(src)
 

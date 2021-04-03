@@ -12,13 +12,13 @@ class _Polynomial : public Polynomial<int>
     friend _Polynomial operator+(_Polynomial &&lhs, const _Polynomial &rhs)
     {
         lhs += rhs;
-        return lhs;
+        return std::move(lhs);
     }
 
     friend _Polynomial operator+(const _Polynomial &lhs, _Polynomial &&rhs)
     {
         rhs += lhs;
-        return rhs;
+        return std::move(rhs);
     }
 
     const auto &data() const noexcept { return m_coeff; };

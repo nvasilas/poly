@@ -56,6 +56,7 @@ template <typename T> class Polynomial
 {
   public:
     Polynomial() = default;
+    Polynomial(T val) : m_coeff{val} {}
     explicit Polynomial(const std::vector<T> &coeff_) : m_coeff(coeff_) {}
     explicit Polynomial(std::vector<T> &&coeff_) : m_coeff(std::move(coeff_)) {}
     Polynomial(const T c[], std::size_t deg) : m_coeff(c, c + deg + 1) {}
@@ -222,6 +223,20 @@ std::ostream &operator<<(std::ostream &os, const Polynomial<T> &poly)
               std::ostream_iterator<T>(os, ", "));
     os << coeff.back();
     return os;
+}
+
+template <typename T>
+inline Polynomial<T> conj(const Polynomial<T> &poly) noexcept
+{
+    std::cout << "conj\n";
+    return poly;
+}
+
+template <typename T>
+inline const auto &max(const Polynomial<T> &lhs,
+                       const Polynomial<T> &rhs) noexcept
+{
+    return (lhs.degree() > rhs.degree()) ? lhs : rhs;
 }
 
 } // namespace poly

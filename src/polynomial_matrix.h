@@ -2,107 +2,66 @@
 #define POLYNOMIAL_MATRIX_H
 
 #include <algorithm>
-#include <vector>
+#include <blaze/Blaze.h>
 
-#include "matrix.h"
 #include "polynomial.h"
 
 namespace poly {
-template <typename T> class PolynomialMatrix : public Matrix<Polynomial<T>>
+
+template <typename T>
+using PolynomialMatrix = typename blaze::DynamicMatrix<poly::Polynomial<T>>;
+
+template <typename T> using Matrix = typename blaze::DynamicMatrix<T>;
+
+template <typename T> auto to_matrix(const PolynomialMatrix<T> &other)
 {
-    using _Matrix = Matrix<Polynomial<T>>;
+    const auto rows = other.rows();
+    const auto max_col = max(other).degree() + 1;
+    Matrix<T> result(rows, max_col * other.columns(), T(0));
 
-  public:
-    PolynomialMatrix() = default;
-    PolynomialMatrix(std::size_t rows_, std::size_t cols_)
-        : _Matrix(rows_, cols_)
-    {}
-    PolynomialMatrix(std::size_t rows_, std::size_t cols_,
-                     const std::vector<Polynomial<T>> &vec_)
-        : _Matrix(rows_, cols_, vec_)
-    {}
-    PolynomialMatrix(std::size_t rows_, std::size_t cols_,
-                     std::vector<Polynomial<T>> &&vec_)
-        : _Matrix(rows_, cols_, std::move(vec_))
-    {}
-    PolynomialMatrix(std::size_t rows_, const std::vector<Polynomial<T>> &vec_)
-        : _Matrix(rows_, vec_)
-    {}
-    PolynomialMatrix(std::size_t rows_, std::vector<Polynomial<T>> &&vec_)
-        : _Matrix(rows_, std::move(vec_))
-    {}
-
-    PolynomialMatrix(const PolynomialMatrix &) = default;
-    PolynomialMatrix(PolynomialMatrix &&) = default;
-    PolynomialMatrix &operator=(const PolynomialMatrix &) = default;
-    PolynomialMatrix &operator=(PolynomialMatrix &&) = default;
-    ~PolynomialMatrix() = default;
-
-    void remove_trailing_zeros()
-    {
-        for (auto &poly : this->data())
-            poly.remove_trailing_zeros();
-    }
-
-    auto max_degree() const
-    {
-        const auto _data = this->data();
-        return std::max_element(_data.cbegin(), _data.cend(),
-                                [](const auto &lhs, const auto &rhs) {
-                                    return lhs.degree() < rhs.degree();
-                                })
-            ->degree();
-    }
-
-    auto to_matrix() const
-    {
-        const auto max_col = this->max_degree() + 1;
-        std::vector<T> mat(this->rows() * max_col * this->cols(), T{});
-
-        auto position = mat.begin();
-        const auto _data = this->data();
-        for (const auto &poly : _data) {
-            std::copy(poly.data().cbegin(), poly.data().cend(), position);
+    for (std::size_t i = 0; i < rows; ++i) {
+        auto position = result.begin(i);
+        for (auto it = other.cbegin(i); it != other.cend(i); ++it) {
+            std::copy(it->data().cbegin(), it->data().cend(), position);
             std::advance(position, max_col);
         }
-        return mat;
     }
-
-    auto to_coeff_matrix() const
-    {
-        const auto _rows = this->rows();
-        const auto _cols = this->cols();
-        if (_rows == 1 || _cols == 1)
-            return to_matrix();
-        const auto mat = to_matrix();
-        std::vector<int> ret;
-        ret.reserve(mat.size());
-
-        const auto max_col = max_degree() + 1;
-        for (std::size_t i = 0; i < _rows; ++i)
-            for (std::size_t j = 0; j < max_col; ++j) {
-                const auto row_ = i * _cols * max_col;
-                ret.push_back(mat[j + row_]);
-                ret.push_back(mat[j + max_col + row_]);
-            }
-        return ret;
-    }
-};
-
-template <typename T>
-inline PolynomialMatrix<T> operator*(const PolynomialMatrix<T> &lhs,
-                                     const T val)
-{
-    auto ret(lhs);
-    ret *= val;
-    return ret;
+    return result;
 }
 
-template <typename T>
-inline PolynomialMatrix<T> operator*(const T val,
-                                     const PolynomialMatrix<T> &rhs)
+template <typename T> auto to_coeff_matrix(const PolynomialMatrix<T> &other)
 {
-    return rhs * val;
+    if (other.rows() == 1 || other.columns() == 1)
+        return to_matrix(other);
+    const auto mat = to_matrix(other);
+    Matrix<T> result(mat.rows(), mat.columns());
+
+    // Matrix<int> in{
+    //     {1, 0, -7, 6, 0, 0, 0, 0},
+    //     {1, -1, -4, 4, 1, 0, 0, 0},
+    //     {1, 5, 6, 0, 0, 0, 0, 0}
+    // };
+    // Matrix<int> out{
+    //     {1, 0, 0, 0, -7, 0, 6, 0},
+    //     {1, 1, -1, 0, -4, 0, 4, 0},
+    //     {1, 0, 5, 0, 6, 0, 0, 0}
+    // };
+
+    // result: 0, 1 | 2, 3 | 4, 5 | 6, 7
+    // mat:    0, 4 | 1, 5 | 2, 6 | 3, 7 -> j, j + max_col
+
+    const auto max_col = max(other).degree() + 1;
+    for (std::size_t i = 0; i < mat.rows(); ++i) {
+        for (std::size_t k = 0, j = 0; j < max_col; k += 2, ++j) {
+            result(i, k) = mat(i, j);
+            result(i, k + 1) = mat(i, j + max_col);
+            // if (i == 1) {
+            //     std::cout << "k, k+1 = " << k << ", " << k+1 <<
+            //     " j, j+max_col = " << j << " ," << j+max_col << std::endl;
+            // }
+        }
+    }
+    return result;
 }
 
 } // namespace poly
