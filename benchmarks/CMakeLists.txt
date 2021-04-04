@@ -8,15 +8,16 @@ find_package(benchmark REQUIRED)
 add_library(benchmark_options INTERFACE)
 target_compile_features(benchmark_options INTERFACE cxx_std_17)
 
+find_package(blaze REQUIRED)
 set(BENCHMARK_FLAGS
     -march=x86-64
     -mtune=generic
+    -mavx
     -O3
     -pipe
     -Wall
     -pedantic
     -Werror
-    -fno-exceptions
     -fno-rtti
 )
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
@@ -34,3 +35,7 @@ target_link_libraries(benchmark_transform_vs_loop
 add_executable(benchmark_add_overloads benchmark_add_overloads.cpp)
 target_link_libraries(benchmark_add_overloads
     benchmark_options benchmark::benchmark)
+
+add_executable(benchmark_to_coeff_matrix benchmark_to_coeff_matrix.cpp)
+target_link_libraries(benchmark_to_coeff_matrix
+    benchmark_options benchmark::benchmark blaze::blaze)

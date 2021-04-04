@@ -1,6 +1,5 @@
 #include "../src/polynomial_matrix.h"
 #include "gtest/gtest.h"
-#include <blaze/math/dense/DynamicMatrix.h>
 
 using namespace poly;
 
@@ -177,12 +176,22 @@ TEST(TestPolynomialMatrix, to_matrix)
     ASSERT_EQ(to_matrix(m2), expected2);
 
     PolynomialMatrix<int> m3{{{0}}, {{1, 0}}};
-    blaze::DynamicMatrix<int> expected3{{0, 0}, {1, 0}};
+    Matrix<int> expected3{{0, 0}, {1, 0}};
     ASSERT_EQ(to_matrix(m3), expected3);
 
     PolynomialMatrix<int> m4{{{0}}};
-    blaze::DynamicMatrix<int> expected4{{0}};
+    Matrix<int> expected4{{0}};
     ASSERT_EQ(to_matrix(m4), expected4);
+
+    PolynomialMatrix<int> m5{
+        {{1, 0, -7, 6}, {0}, {1, 2}},
+        {{1, -1, -4, 4}, {1, 0}, {1}},
+        {{1, 5, 6}, {0}, {0}}
+    };
+    Matrix<int> expected5{{1, 0, -7, 6, 0, 0, 0, 0, 1, 2, 0, 0},
+                          {1, -1, -4, 4, 1, 0, 0, 0, 1, 0, 0, 0},
+                          {1, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0 ,0}};
+    ASSERT_EQ(to_matrix(m5), expected5);
 }
 
 TEST(TestPolynomialMatrix, to_coeff_matrix)
@@ -197,6 +206,8 @@ TEST(TestPolynomialMatrix, to_coeff_matrix)
         {1, 1, -1, 0, -4, 0, 4, 0},
         {1, 0, 5, 0, 6, 0, 0, 0}
     };
+    auto mat_coeff = to_coeff_matrix(m1);
+    std::cout << mat_coeff << std::endl;
     ASSERT_EQ(to_coeff_matrix(m1), expected1);
 
     PolynomialMatrix<int> m2{
@@ -235,4 +246,16 @@ TEST(TestPolynomialMatrix, to_coeff_matrix)
     };
     Matrix<int> expected6{{ 0, 1 }};
     ASSERT_EQ(to_coeff_matrix(m6), expected6);
+
+    PolynomialMatrix<int> m7{
+        {{1, 0, -7, 6}, {0}, {1, 2}},
+        {{1, -1, -4, 4}, {1, 0}, {1}},
+        {{1, 5, 6}, {0}, {0}}
+    };
+    Matrix<int> expected7{
+        {1, 0, 1, 0, 0, 2, -7, 0, 0, 6, 0, 0},
+        {1, 1, 1, -1, 0, 0, -4, 0, 0, 4, 0, 0},
+        {1, 0, 0, 5, 0, 0, 6, 0, 0, 0, 0, 0}
+    };
+    ASSERT_EQ(to_coeff_matrix(m7), expected7);
 }
