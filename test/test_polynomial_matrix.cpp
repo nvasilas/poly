@@ -106,31 +106,26 @@ TEST(TestPolynomialMatrix, operator_get_index_by_current_row_and_col)
 
 TEST(TestPolynomialMatrix, operator_multiply_2x2)
 {
-    // clang-format off
     PolynomialMatrix<int> m1{ { p1, p3 },
                               { p2, p1 } };
     auto m2 = m1;
     PolynomialMatrix<int> expected{ { p1 * p1 + p3 * p2, p1 * p3 + p3 * p1 },
                                     { p2 * p1 + p1 * p2, p2 * p3 + p1 * p1 } };
-    // clang-format on
     ASSERT_EQ(m1 * m2, expected);
     ASSERT_EQ(m2 * m1, expected);
 }
 
 TEST(TestPolynomialMatrix, operator_multiply_1x2_2x1)
 {
-    // clang-format off
     PolynomialMatrix<int> m1{ { p1, p2 } };
     PolynomialMatrix<int> m2{ { p3 },
                               { p4 } };
-    // clang-format on
     PolynomialMatrix<int> expected{{p1 * p3 + p2 * p4}};
     ASSERT_EQ(m1 * m2, expected);
 }
 
 // TEST(TestPolynomialMatrix, operator_eval)
 // {
-//     // clang-format off
 //     PolynomialMatrix<int> m(2, {
 //             p1, p3,
 //             p2, p1
@@ -143,7 +138,6 @@ TEST(TestPolynomialMatrix, operator_multiply_1x2_2x1)
 //             13, 16,
 //             3, 13
 //     };
-//     // clang-format on
 //     ASSERT_EQ(m(0), expected_0);
 //     ASSERT_EQ(m(2), expected_2);
 // }

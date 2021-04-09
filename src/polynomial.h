@@ -2,6 +2,7 @@
 #define POLYNOMIAL_H
 
 #include <algorithm>
+#include <cassert>
 #include <cmath>
 #include <iostream>
 #include <iterator>
@@ -63,9 +64,9 @@ template <typename T> class Polynomial
     Polynomial(std::initializer_list<T> init) : m_coeff(init) {}
 
     Polynomial(const Polynomial &) = default;
-    Polynomial(Polynomial &&) = default;
+    Polynomial(Polynomial &&) noexcept = default;
     Polynomial &operator=(const Polynomial &) = default;
-    Polynomial &operator=(Polynomial &&) = default;
+    Polynomial &operator=(Polynomial &&) noexcept = default;
 
     Polynomial &operator=(std::initializer_list<T> init)
     {
@@ -228,7 +229,7 @@ std::ostream &operator<<(std::ostream &os, const Polynomial<T> &poly)
 template <typename T>
 inline Polynomial<T> conj(const Polynomial<T> &poly) noexcept
 {
-    std::cout << "conj\n";
+    static_assert(true && "conj shouldn't be called\n");
     return poly;
 }
 

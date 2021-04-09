@@ -2,4 +2,6 @@ build/
 benchmarks/build/
 
 compile_commands.json
+.vimspector.json
 .cache/
+.vscode/

@@ -15,6 +15,7 @@ template <typename T> class PolynomialFraction
 {
   public:
     PolynomialFraction() = default;
+    PolynomialFraction(T val) : m_num{val}, m_den{val} {}
     PolynomialFraction(const Polynomial<T> &num_, const Polynomial<T> &den_)
         : m_num(num_), m_den(den_)
     {}
@@ -47,9 +48,9 @@ template <typename T> class PolynomialFraction
     {}
 
     PolynomialFraction(const PolynomialFraction &) = default;
-    PolynomialFraction(PolynomialFraction &&) = default;
+    PolynomialFraction(PolynomialFraction &&) noexcept = default;
     PolynomialFraction &operator=(const PolynomialFraction &) = default;
-    PolynomialFraction &operator=(PolynomialFraction &&) = default;
+    PolynomialFraction &operator=(PolynomialFraction &&) noexcept = default;
     ~PolynomialFraction() = default;
 
     PolynomialFraction &operator+=(const PolynomialFraction &other)
@@ -167,8 +168,15 @@ inline PolynomialFraction<T> operator*(const T val,
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const PolynomialFraction<T> &frac)
 {
-    os << frac.num() << '\n' << frac.den();
+    os << "[ " << frac.num() << " ] / [ " << frac.den() << " ]";
     return os;
+}
+
+template <typename T>
+inline PolynomialFraction<T> conj(const PolynomialFraction<T> &frac) noexcept
+{
+    static_assert(true && "conj shouldn't be called\n");
+    return frac;
 }
 
 } // namespace poly

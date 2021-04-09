@@ -3,7 +3,7 @@
 
 using namespace poly;
 
-const PolynomialMatrix<int> POLY_MATRIX{
+const PolynomialMatrix<int> POLY_MATRIX_BIG{
     {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
     {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
     {{1, 0, -7, 6}, {0}, {1, 2}},
@@ -13,9 +13,33 @@ const PolynomialMatrix<int> POLY_MATRIX{
     {{1, -1, -4, 4}, {1, 0}, {1}},
     {{1, -1, -4, 4}, {1, 0}, {1}},
     {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
     {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
     {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
     {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}, {1, 0, -7, 6}, {0}, {1, 2}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, -1, -4, 4}, {1, 0}, {1}},
+    {{1, 5, 6}, {0}, {0}}
+};
+
+const PolynomialMatrix<int> POLY_MATRIX_SMALL{
+    {{1, 0, -7, 6}, {0}, {1, 2}},
     {{1, -1, -4, 4}, {1, 0}, {1}},
     {{1, 5, 6}, {0}, {0}}
 };
@@ -53,17 +77,8 @@ static auto to_coeff_using_to_matrix(const PolynomialMatrix<T> &poly_matrix)
     return ret;
 }
 
-static void BM_to_coeff_using_to_matrix(benchmark::State &state)
-{
-    for (auto _ : state) {
-        const auto mat_coeff = to_coeff_using_to_matrix(POLY_MATRIX);
-        benchmark::DoNotOptimize(mat_coeff.data());
-    }
-}
-BENCHMARK(BM_to_coeff_using_to_matrix);
-
 template <typename T>
-auto to_coeff_one_pass(const PolynomialMatrix<T> &poly_matrix)
+static auto to_coeff_one_pass(const PolynomialMatrix<T> &poly_matrix)
 {
     const auto rows = poly_matrix.rows();
     const auto cols = poly_matrix.columns();
@@ -77,20 +92,47 @@ auto to_coeff_one_pass(const PolynomialMatrix<T> &poly_matrix)
         for (std::size_t k = 0; k < max_size; ++k) {
             for (auto it = poly_matrix.cbegin(i); it != poly_matrix.cend(i);
                  ++it) {
-                *it_ret++ = (it->size() > k) ? (*it)[k] : T(0);
+                *it_ret++ = (k < it->size()) ? (*it)[k] : T(0);
             }
         }
     }
     return ret;
 }
 
-static void BM_to_coeff_one_pass(benchmark::State &state)
+static void BM_to_coeff_using_to_matrix_small(benchmark::State &state)
 {
     for (auto _ : state) {
-        const auto mat_coeff = to_coeff_one_pass(POLY_MATRIX);
+        const auto mat_coeff = to_coeff_using_to_matrix(POLY_MATRIX_SMALL);
         benchmark::DoNotOptimize(mat_coeff.data());
     }
 }
-BENCHMARK(BM_to_coeff_one_pass);
+BENCHMARK(BM_to_coeff_using_to_matrix_small);
+
+static void BM_to_coeff_one_pass_small(benchmark::State &state)
+{
+    for (auto _ : state) {
+        const auto mat_coeff = to_coeff_one_pass(POLY_MATRIX_SMALL);
+        benchmark::DoNotOptimize(mat_coeff.data());
+    }
+}
+BENCHMARK(BM_to_coeff_one_pass_small);
+
+static void BM_to_coeff_using_to_matrix_big(benchmark::State &state)
+{
+    for (auto _ : state) {
+        const auto mat_coeff = to_coeff_using_to_matrix(POLY_MATRIX_BIG);
+        benchmark::DoNotOptimize(mat_coeff.data());
+    }
+}
+BENCHMARK(BM_to_coeff_using_to_matrix_big);
+
+static void BM_to_coeff_one_pass_big(benchmark::State &state)
+{
+    for (auto _ : state) {
+        const auto mat_coeff = to_coeff_one_pass(POLY_MATRIX_BIG);
+        benchmark::DoNotOptimize(mat_coeff.data());
+    }
+}
+BENCHMARK(BM_to_coeff_one_pass_big);
 
 BENCHMARK_MAIN();

@@ -15,5 +15,5 @@ configure_gtest(test_polynomial_fraction)
 add_executable(test_polynomial_matrix test_polynomial_matrix.cpp)
 configure_gtest(test_polynomial_matrix)
 
-# add_executable(test_matrix_fraction_description test_matrix_fraction_description.cpp)
-# configure_gtest(test_matrix_fraction_description)
+add_executable(test_matrix_fraction_description test_matrix_fraction_description.cpp)
+configure_gtest(test_matrix_fraction_description)
