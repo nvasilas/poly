@@ -47,7 +47,7 @@ TEST(TestPolynomialFractionMatrix, operator_not_equal)
 TEST(TestPolynomialFractionMatrix, operator_plus)
 {
     PolynomialFractionMatrix<int> m{{f1, f2}, {f2, f1}};
-    PolynomialFractionMatrix<int> expected{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> expected{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     ASSERT_EQ(m + m, expected);
 }
 
@@ -55,13 +55,13 @@ TEST(TestPolynomialFractionMatrix, operator_compound_plus)
 {
     PolynomialFractionMatrix<int> m{{f1, f2}, {f2, f1}};
     m += m;
-    PolynomialFractionMatrix<int> expected{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> expected{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     ASSERT_EQ(m, expected);
 }
 
 TEST(TestPolynomialFractionMatrix, operator_minus)
 {
-    PolynomialFractionMatrix<int> m1{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> m1{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     PolynomialFractionMatrix<int> m2{{f1, f2}, {f2, f1}};
     PolynomialFractionMatrix<int> expected{{f1, f2}, {f2, f1}};
     ASSERT_EQ(m1 - m2, expected);
@@ -69,7 +69,7 @@ TEST(TestPolynomialFractionMatrix, operator_minus)
 
 TEST(TestPolynomialFractionMatrix, operator_compound_minus)
 {
-    PolynomialFractionMatrix<int> m1{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> m1{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     PolynomialFractionMatrix<int> m2{{f1, f2}, {f2, f1}};
     PolynomialFractionMatrix<int> expected{{f1, f2}, {f2, f1}};
     m1 -= m2;
@@ -79,14 +79,14 @@ TEST(TestPolynomialFractionMatrix, operator_compound_minus)
 TEST(TestPolynomialFractionMatrix, operator_multiply_constant)
 {
     const PolynomialFractionMatrix<int> m{{f1, f2}, {f2, f1}};
-    PolynomialFractionMatrix<int> expected{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> expected{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     ASSERT_EQ(m * 2, expected);
 }
 
 TEST(TestPolynomialFractionMatrix, operator_compound_multiply_constant)
 {
     PolynomialFractionMatrix<int> m{{f1, f2}, {f2, f1}};
-    PolynomialFractionMatrix<int> expected{{2*f1, 2*f2}, {2*f2, 2*f1}};
+    PolynomialFractionMatrix<int> expected{{2 * f1, 2 * f2}, {2 * f2, 2 * f1}};
     m *= 2;
     ASSERT_EQ(m, expected);
 }
@@ -105,52 +105,40 @@ TEST(TestPolynomialFractionMatrix, operator_multiply_2x2)
     PolynomialFractionMatrix<int> m1{{f1, f2}, {f2, f1}};
     auto m2 = m1;
     PolynomialFractionMatrix<int> expected{
-        { f1 * f1 + f2 * f2, f1 * f2 + f2 * f1 },
-        { f2 * f1 + f1 * f2, f2 * f2 + f1 * f1 }
-    };
+        {f1 * f1 + f2 * f2, f1 * f2 + f2 * f1},
+        {f2 * f1 + f1 * f2, f2 * f2 + f1 * f1}};
     ASSERT_EQ(m1 * m2, expected);
     ASSERT_EQ(m2 * m1, expected);
 }
 
 TEST(TestPolynomialFractionMatrix, operator_multiply_1x2_2x1)
 {
-    PolynomialFractionMatrix<int> m1{ { f1, f2 } };
-    PolynomialFractionMatrix<int> m2{ { f2 }, { f1 } };
+    PolynomialFractionMatrix<int> m1{{f1, f2}};
+    PolynomialFractionMatrix<int> m2{{f2}, {f1}};
     PolynomialFractionMatrix<int> expected{{f1 * f2 + f2 * f1}};
     ASSERT_EQ(m1 * m2, expected);
 }
 
-#if 0
 TEST(TestPolynomialFractionMatrix, get_left)
 {
-    // clang-format off
-    PolynomialFractionMatrix<int> mf(3, 2, {
-                                     {{1}, {2, 1}}, {{0}, {1}},
-                                     {{1}, {3, 1}}, {{1}, {-3, 1}},
-                                     {{1}, {2, -3, 1}}, {{0}, {1}},
-                                     });
-    auto [Nl, Dl] = mf.get_left();
+    PolynomialFractionMatrix<int> mf{
+        {{{1}, {2, 1}}, {{0}, {1}}},
+        {{{1}, {3, 1}}, {{1}, {-3, 1}}},
+        {{{1}, {2, -3, 1}}, {{0}, {1}}},
+    };
+    auto [Nl, Dl] = get_left(mf);
 
-    PolynomialMatrix<int> expected_Nl(3, 2, {
-                                      {1}, {0},
-                                      {-3, 1}, {3, 1},
-                                      {1}, {0},
-                                      });
-    PolynomialMatrix<int> expected_Dl(3, 3, {
-                                      {2, 1}, {0}, {0},
-                                      {0}, {-9, 0, 1}, {0},
-                                      {0}, {0}, {2, -3, 1},
-                                      });
-    // clang-format on
-
-    std::cout << Nl << std::endl;
-    std::cout << std::endl;
-    std::cout << Dl << std::endl;
-    std::cout << std::endl;
-    std::cout << expected_Nl << std::endl;
-    std::cout << expected_Dl << std::endl;
+    PolynomialMatrix<int> expected_Nl{
+        {{1}, {0}},
+        {{-3, 1}, {3, 1}},
+        {{1}, {0}},
+    };
+    PolynomialMatrix<int> expected_Dl{
+        {{2, 1}, {0}, {0}},
+        {{0}, {-9, 0, 1}, {0}},
+        {{0}, {0}, {2, -3, 1}},
+    };
 
     ASSERT_EQ(Nl, expected_Nl);
     ASSERT_EQ(Dl, expected_Dl);
 }
-#endif

@@ -124,69 +124,51 @@ TEST(TestPolynomialMatrix, operator_multiply_1x2_2x1)
     ASSERT_EQ(m1 * m2, expected);
 }
 
-// TEST(TestPolynomialMatrix, operator_eval)
-// {
-//     PolynomialMatrix<int> m(2, {
-//             p1, p3,
-//             p2, p1
-//     });
-//     std::vector<int> expected_0 = {
-//             1, 0,
-//             -1, 1
-//     };
-//     std::vector<int> expected_2 = {
-//             13, 16,
-//             3, 13
-//     };
-//     ASSERT_EQ(m(0), expected_0);
-//     ASSERT_EQ(m(2), expected_2);
-// }
-
 TEST(TestPolynomialMatrix, max_degree)
 {
     PolynomialMatrix<int> m{{p1, p4}, {p2, p1}};
     ASSERT_EQ(max(m).degree(), 4);
 }
 
-TEST(TestPolynomialMatrix, to_matrix)
-{
-    PolynomialMatrix<int> m1{
-        {{1, 0, -7, 6}, {0}},
-        {{1, -1, -4, 4}, {1, 0}},
-        {{1, 5, 6}, {0}}
-    };
-    Matrix<int> expected1{{1, 0, -7, 6, 0, 0, 0, 0},
-                          {1, -1, -4, 4, 1, 0, 0, 0},
-                          {1, 5, 6, 0, 0, 0, 0, 0}};
-    ASSERT_EQ(to_matrix(m1), expected1);
+// TEST(TestPolynomialMatrix, to_matrix)
+// {
+//     PolynomialMatrix<int> m1{
+//         {{1, 0, -7, 6}, {0}},
+//         {{1, -1, -4, 4}, {1, 0}},
+//         {{1, 5, 6}, {0}}
+//     };
+//     Matrix<int> expected1{{1, 0, -7, 6, 0, 0, 0, 0},
+//                           {1, -1, -4, 4, 1, 0, 0, 0},
+//                           {1, 5, 6, 0, 0, 0, 0, 0}};
+//     ASSERT_EQ(to_matrix(m1), expected1);
 
-    PolynomialMatrix<int> m2{
-        {{0}, {1, 0, -7, 6}}, {{1, 0}, {1, -1, -4, 4}}, {{0}, {1, 5, 6}}};
-    Matrix<int> expected2{
-        {0, 0, 0, 0, 1, 0, -7, 6},
-        {1, 0, 0, 0, 1, -1, -4, 4},
-        {0, 0, 0, 0, 1, 5, 6, 0},
-    };
-    ASSERT_EQ(to_matrix(m2), expected2);
+//     PolynomialMatrix<int> m2{
+//         {{0}, {1, 0, -7, 6}}, {{1, 0}, {1, -1, -4, 4}}, {{0}, {1, 5, 6}}};
+//     Matrix<int> expected2{
+//         {0, 0, 0, 0, 1, 0, -7, 6},
+//         {1, 0, 0, 0, 1, -1, -4, 4},
+//         {0, 0, 0, 0, 1, 5, 6, 0},
+//     };
+//     ASSERT_EQ(to_matrix(m2), expected2);
 
-    PolynomialMatrix<int> m3{{{0}}, {{1, 0}}};
-    Matrix<int> expected3{{0, 0}, {1, 0}};
-    ASSERT_EQ(to_matrix(m3), expected3);
+//     PolynomialMatrix<int> m3{{{0}}, {{1, 0}}};
+//     Matrix<int> expected3{{0, 0}, {1, 0}};
+//     ASSERT_EQ(to_matrix(m3), expected3);
 
-    PolynomialMatrix<int> m4{{{0}}};
-    Matrix<int> expected4{{0}};
-    ASSERT_EQ(to_matrix(m4), expected4);
+//     PolynomialMatrix<int> m4{{{0}}};
+//     Matrix<int> expected4{{0}};
+//     ASSERT_EQ(to_matrix(m4), expected4);
 
-    PolynomialMatrix<int> m5{
-        {{1, 0, -7, 6}, {0}, {1, 2}},
-        {{1, -1, -4, 4}, {1, 0}, {1}},
-        {{1, 5, 6}, {0}, {0}}
-    };
-    Matrix<int> expected5{{1, 0, -7, 6, 0, 0, 0, 0, 1, 2, 0, 0},
-                          {1, -1, -4, 4, 1, 0, 0, 0, 1, 0, 0, 0},
-                          {1, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0 ,0}};
-    ASSERT_EQ(to_matrix(m5), expected5);
-}
+//     PolynomialMatrix<int> m5{
+//         {{1, 0, -7, 6}, {0}, {1, 2}},
+//         {{1, -1, -4, 4}, {1, 0}, {1}},
+//         {{1, 5, 6}, {0}, {0}}
+//     };
+//     Matrix<int> expected5{{1, 0, -7, 6, 0, 0, 0, 0, 1, 2, 0, 0},
+//                           {1, -1, -4, 4, 1, 0, 0, 0, 1, 0, 0, 0},
+//                           {1, 5, 6, 0, 0, 0, 0, 0, 0, 0, 0 ,0}};
+//     ASSERT_EQ(to_matrix(m5), expected5);
+// }
 
 TEST(TestPolynomialMatrix, to_coeff_matrix)
 {

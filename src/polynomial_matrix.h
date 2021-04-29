@@ -11,69 +11,80 @@ namespace poly {
 template <typename T>
 using PolynomialMatrix = typename blaze::DynamicMatrix<poly::Polynomial<T>>;
 
-template <typename T> using Matrix = typename blaze::DynamicMatrix<T>;
+// template <typename T> using Matrix = typename blaze::DynamicMatrix<T>;
 
-template <typename T> auto to_matrix(const PolynomialMatrix<T> &poly_matrix)
+template <typename T> struct Matrix
 {
-    const auto rows = poly_matrix.rows();
-    const auto max_size = max(poly_matrix).size();
-    Matrix<T> ret(rows, max_size * poly_matrix.columns(), T(0));
+    auto rows() const noexcept { return matrix.rows(); }
+    auto columns() const noexcept { return matrix.columns(); }
+    auto coef_columns() const noexcept { return matrix.columns() / deg; }
 
-    for (std::size_t i = 0; i < rows; ++i) {
-        auto position = ret.begin(i);
-        for (auto it = poly_matrix.cbegin(i); it != poly_matrix.cend(i); ++it) {
-            std::copy(it->data().cbegin(), it->data().cend(), position);
-            std::advance(position, max_size);
-        }
+    auto &operator()(std::size_t row, std::size_t col)
+    {
+        return matrix(row, col);
     }
-    return ret;
+    const auto &operator()(std::size_t row, std::size_t col) const
+    {
+        return matrix(row, col);
+    }
+
+    blaze::DynamicMatrix<T> matrix;
+    std::size_t deg;
+};
+
+template <typename T>
+std::ostream &operator<<(std::ostream &os, const Matrix<T> &m)
+{
+    os << "deg: " << m.deg << ", matrix:\n";
+    os << m.matrix;
+    return os;
 }
 
-// template <typename T>
-// auto to_coeff_matrix(const PolynomialMatrix<T> &poly_matrix)
+// TODO
+// template <typename T> auto to_matrix(const PolynomialMatrix<T> &poly_matrix)
 // {
-//     if (poly_matrix.rows() == 1 || poly_matrix.columns() == 1)
-//         return to_matrix(poly_matrix);
-//     const auto mat = to_matrix(poly_matrix);
-//     Matrix<T> ret(mat.rows(), mat.columns());
-
-//     // Matrix<int> in{
-//     //     {1, 0, -7, 6, | 0, 0, 0, 0, | 1, 2, 0, 0},
-//     //     {1, -1, -4, 4,| 1, 0, 0, 0, | 1, 0, 0, 0},
-//     //     {1, 5, 6, 0,  | 0, 0, 0, 0, | 0, 0, 0 ,0}
-//     // };
-//     // Matrix<int> out{
-//     //     {1, 0, 1, | 0, 0, 2, | -7, 0, 0, | 6, 0, 0},
-//     //     {1, 1, 1, | -1, 0, 0,| -4, 0, 0, | 4, 0, 0},
-//     //     {1, 0, 0, | 5, 0, 0, | 0, 0, 6,  | 0, 0, 0}
-//     // };
-//     // ret: 0, 1, 2 | 3, 4, 5 | 6, 7, 8  | 9, 10, 11
-//     // mat: 0, 4, 8 | 1, 5, 9 | 2, 6, 10 | 3, 7, 11
-
+//     const auto rows = poly_matrix.rows();
 //     const auto max_size = max(poly_matrix).size();
-//     for (std::size_t i = 0; i < mat.rows(); ++i) {
-//         std::size_t ret_column = 0;
-//         for (std::size_t k = 0; k < max_size; ++k) {
-//             for (std::size_t j = 0; j < poly_matrix.columns(); ++j) {
-//                 ret(i, ret_column++) = mat(i, k + j * max_size);
-//             }
+//     Matrix<T> ret(rows, max_size * poly_matrix.columns(), T(0));
+
+//     for (std::size_t i = 0; i < rows; ++i) {
+//         auto position = ret.begin(i);
+//         for (auto it = poly_matrix.cbegin(i); it != poly_matrix.cend(i);
+//         ++it) {
+//             std::copy(it->data().cbegin(), it->data().cend(), position);
+//             std::advance(position, max_size);
 //         }
 //     }
 //     return ret;
 // }
 
+// Matrix<int> in{
+//     {1, 0, -7, 6, | 0, 0, 0, 0, | 1, 2, 0, 0},
+//     {1, -1, -4, 4,| 1, 0, 0, 0, | 1, 0, 0, 0},
+//     {1, 5, 6, 0,  | 0, 0, 0, 0, | 0, 0, 0 ,0}
+// };
+// Matrix<int> out{
+//     {1, 0, 1, | 0, 0, 2, | -7, 0, 0, | 6, 0, 0},
+//     {1, 1, 1, | -1, 0, 0,| -4, 0, 0, | 4, 0, 0},
+//     {1, 0, 0, | 5, 0, 0, | 0, 0, 6,  | 0, 0, 0}
+// };
+// ret: 0, 1, 2 | 3, 4, 5 | 6, 7, 8  | 9, 10, 11
+// mat: 0, 4, 8 | 1, 5, 9 | 2, 6, 10 | 3, 7, 11
 template <typename T>
 auto to_coeff_matrix(const PolynomialMatrix<T> &poly_matrix)
 {
     const auto rows = poly_matrix.rows();
     const auto cols = poly_matrix.columns();
-    if (rows == 1 || cols == 1)
-        return to_matrix(poly_matrix);
+    // TODO
+    // if (rows == 1 || cols == 1)
+    //     return to_matrix(poly_matrix);
     const auto max_size = max(poly_matrix).size();
-    Matrix<T> ret(rows, max_size * cols);
+
+    Matrix<T> ret{/*matrix*/ {rows, max_size * cols},
+                  /*deg*/ max_size};
 
     for (std::size_t i = 0; i < rows; ++i) {
-        auto it = ret.begin(i);
+        auto it = ret.matrix.begin(i);
         for (std::size_t k = 0; k < max_size; ++k) {
             for (auto cit = poly_matrix.cbegin(i); cit != poly_matrix.cend(i);
                  ++cit) {
