@@ -1,7 +1,7 @@
 find_package(GTest REQUIRED)
 
 macro(configure_gtest test_name)
-    target_link_libraries(${test_name} GTest::gtest GTest::gtest_main blaze::blaze)
+    target_link_libraries(${test_name} GTest::gtest GTest::gtest_main Eigen3::Eigen)
     target_compile_features(${test_name} PRIVATE cxx_std_17)
     gtest_discover_tests(${test_name})
 endmacro()

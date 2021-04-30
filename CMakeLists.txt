@@ -24,11 +24,11 @@ enable_sanitizers(project_options)
 # allow for static analysis options
 include(cmake/StaticAnalyzers.cmake)
 
-find_package(blaze REQUIRED)
-set(BLAZE_FLAGS -mavx)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
+set(EIGEN_FLAGS -mavx)
 if(CMAKE_CXX_COMPILER_ID STREQUAL "GNU" OR
 	CMAKE_CXX_COMPILER_ID MATCHES ".*Clang")
-    target_compile_options(project_options INTERFACE ${BLAZE_FLAGS})
+    target_compile_options(project_options INTERFACE ${EIGEN_FLAGS})
 else()
     message(AUTHOR_WARNING
 	"No compiler warnings set for '${CMAKE_CXX_COMPILER_ID}' compiler.")

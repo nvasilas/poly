@@ -1,36 +1,68 @@
 #ifndef POLYNOMIAL_MATRIX_H
 #define POLYNOMIAL_MATRIX_H
 
+#include <Eigen/Dense>
 #include <algorithm>
-#include <blaze/Blaze.h>
 
 #include "polynomial.h"
+
+namespace Eigen {
+template <typename T>
+struct NumTraits<poly::Polynomial<T>> : GenericNumTraits<poly::Polynomial<T>>
+{
+    using Real = T;
+
+    // typedef double Real;
+    // typedef double NonInteger;
+    // typedef double Nested;
+
+    // enum
+    // {
+    //     IsInteger = 0,
+    //     IsSigned = 0,
+    //     IsComplex = 0,
+    //     RequireInitialization = 1,
+    //     ReadCost = 1,
+    //     AddCost = 3,
+    //     MulCost = 3
+    // };
+};
+} // namespace Eigen
 
 namespace poly {
 
 template <typename T>
-using PolynomialMatrix = typename blaze::DynamicMatrix<poly::Polynomial<T>>;
-
-// template <typename T> using Matrix = typename blaze::DynamicMatrix<T>;
+using PolynomialMatrix =
+    typename Eigen::Matrix<poly::Polynomial<T>, Eigen::Dynamic, Eigen::Dynamic,
+                           Eigen::RowMajor>;
 
 template <typename T> struct Matrix
 {
+    using EigenMatrix =
+        typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+
     auto rows() const noexcept { return matrix.rows(); }
-    auto columns() const noexcept { return matrix.columns(); }
-    auto coef_columns() const noexcept { return matrix.columns() / deg; }
+    auto cols() const noexcept { return matrix.cols(); }
+    auto coef_columns() const noexcept { return matrix.cols() / deg; }
 
-    auto &operator()(std::size_t row, std::size_t col)
-    {
-        return matrix(row, col);
-    }
-    const auto &operator()(std::size_t row, std::size_t col) const
-    {
-        return matrix(row, col);
-    }
+    auto &operator()(int row, int col) { return matrix(row, col); }
+    const auto &operator()(int row, int col) const { return matrix(row, col); }
 
-    blaze::DynamicMatrix<T> matrix;
+    EigenMatrix matrix;
     std::size_t deg;
 };
+
+template <typename T>
+inline auto operator==(const Matrix<T> &lhs, const Matrix<T> &rhs)
+{
+    return lhs.deg == rhs.deg && lhs.matrix == rhs.matrix;
+}
+
+template <typename T>
+inline auto operator!=(const Matrix<T> &lhs, const Matrix<T> &rhs)
+{
+    return !(lhs == rhs);
+}
 
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const Matrix<T> &m)
@@ -74,21 +106,21 @@ template <typename T>
 auto to_coeff_matrix(const PolynomialMatrix<T> &poly_matrix)
 {
     const auto rows = poly_matrix.rows();
-    const auto cols = poly_matrix.columns();
+    const auto cols = poly_matrix.cols();
     // TODO
     // if (rows == 1 || cols == 1)
     //     return to_matrix(poly_matrix);
-    const auto max_size = max(poly_matrix).size();
+    const auto max_size = poly_matrix.maxCoeff().size();
 
     Matrix<T> ret{/*matrix*/ {rows, max_size * cols},
                   /*deg*/ max_size};
 
-    for (std::size_t i = 0; i < rows; ++i) {
-        auto it = ret.matrix.begin(i);
-        for (std::size_t k = 0; k < max_size; ++k) {
-            for (auto cit = poly_matrix.cbegin(i); cit != poly_matrix.cend(i);
-                 ++cit) {
-                *it++ = (k < cit->size()) ? (*cit)[k] : T(0);
+    for (auto row = 0; row < rows; ++row) {
+        auto col = 0;
+        for (auto k = 0; k < max_size; ++k) {
+            for (auto j = 0; j < cols; ++j) {
+                const auto poly = poly_matrix(row, j);
+                ret(row, col++) = (k < poly.size()) ? poly[k] : T(0);
             }
         }
     }

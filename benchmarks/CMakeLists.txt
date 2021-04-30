@@ -8,7 +8,7 @@ find_package(benchmark REQUIRED)
 add_library(benchmark_options INTERFACE)
 target_compile_features(benchmark_options INTERFACE cxx_std_17)
 
-find_package(blaze REQUIRED)
+find_package(Eigen3 3.3 REQUIRED NO_MODULE)
 set(BENCHMARK_FLAGS
     -march=x86-64
     -mtune=generic
@@ -38,4 +38,4 @@ target_link_libraries(benchmark_add_overloads
 
 add_executable(benchmark_to_coeff_matrix benchmark_to_coeff_matrix.cpp)
 target_link_libraries(benchmark_to_coeff_matrix
-    benchmark_options benchmark::benchmark blaze::blaze)
+    benchmark_options benchmark::benchmark Eigen3::Eigen)
