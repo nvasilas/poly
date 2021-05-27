@@ -15,5 +15,7 @@ configure_gtest(test_polynomial_fraction)
 add_executable(test_polynomial_matrix test_polynomial_matrix.cpp)
 configure_gtest(test_polynomial_matrix)
 
-add_executable(test_polynomial_fraction_matrix test_polynomial_fraction_matrix.cpp)
+add_executable(test_polynomial_fraction_matrix
+    ${CMAKE_CURRENT_LIST_DIR}/../src/polynomial_fraction_matrix.cpp
+    test_polynomial_fraction_matrix.cpp)
 configure_gtest(test_polynomial_fraction_matrix)

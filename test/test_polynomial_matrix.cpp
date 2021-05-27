@@ -185,8 +185,8 @@ TEST(TestPolynomialMatrix, to_coeff_matrix)
                   .finished();
     Matrix<int> expected1{
         /*matrix*/
-        {(Matrix<int>::EigenMatrix(3, 8) << 1, 0, 0, 0, -7, 0, 6, 0, /* 0 row */
-          1, 1, -1, 0, -4, 0, 4, 0,                                  /* 1 row */
+        {(Eigen::MatrixXi(3, 8) << 1, 0, 0, 0, -7, 0, 6, 0, /* 0 row */
+          1, 1, -1, 0, -4, 0, 4, 0,                         /* 1 row */
           1, 0, 5, 0, 6, 0, 0, 0 /* 2 row */)
              .finished()},
         /*deg*/ 4};
@@ -197,18 +197,17 @@ TEST(TestPolynomialMatrix, to_coeff_matrix)
                   .finished();
     Matrix<int> expected2{
         /*matrix*/
-        {(Matrix<int>::EigenMatrix(3, 8) << 0, 1, 0, 0, 0, -7, 0, 6, /* 0 row */
-          1, 1, 0, -1, 0, -4, 0, 4,                                  /* 1 row */
+        {(Eigen::MatrixXi(3, 8) << 0, 1, 0, 0, 0, -7, 0, 6, /* 0 row */
+          1, 1, 0, -1, 0, -4, 0, 4,                         /* 1 row */
           0, 1, 0, 5, 0, 6, 0, 0 /* 2 row */)
              .finished()},
         /*deg*/ 4};
     ASSERT_EQ(to_coeff_matrix(m2), expected2);
 
     auto m3 = (PolynomialMatrix<int>(2, 1) << P{0}, P{1, 0}).finished();
-    Matrix<int> expected3{
-        /*matrix*/
-        {(Matrix<int>::EigenMatrix(2, 2) << 0, 0, 1, 0).finished()},
-        /*deg*/ 2};
+    Matrix<int> expected3{/*matrix*/
+                          {(Eigen::MatrixXi(2, 2) << 0, 0, 1, 0).finished()},
+                          /*deg*/ 2};
     ASSERT_EQ(to_coeff_matrix(m3), expected3);
 #if 0
 
@@ -235,8 +234,8 @@ TEST(TestPolynomialMatrix, to_coeff_matrix)
                P{1, -1, -4, 4}, P{1, 0}, P{1}, P{1, 5, 6}, P{0}, P{0})
                   .finished();
     Matrix<int> expected7{/*matrix*/
-                          {(Matrix<int>::EigenMatrix(3, 12) << 1, 0, 1, 0, 0, 2,
-                            -7, 0, 0, 6, 0, 0,                    /* 0 row */
+                          {(Eigen::MatrixXi(3, 12) << 1, 0, 1, 0, 0, 2, -7, 0,
+                            0, 6, 0, 0,                           /* 0 row */
                             1, 1, 1, -1, 0, 0, -4, 0, 0, 4, 0, 0, /* 1 row */
                             1, 0, 0, 5, 0, 0, 6, 0, 0, 0, 0, 0 /* 2 row */)
                                .finished()},

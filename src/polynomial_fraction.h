@@ -149,9 +149,9 @@ inline PolynomialFraction<T> operator*(const PolynomialFraction<T> &lhs,
     return ret;
 }
 
-template <typename T>
-inline PolynomialFraction<T> operator*(const PolynomialFraction<T> &lhs,
-                                       const T val)
+template <typename t>
+inline PolynomialFraction<t> operator*(const PolynomialFraction<t> &lhs,
+                                       const t val)
 {
     auto ret(lhs);
     ret *= val;
@@ -164,6 +164,13 @@ inline PolynomialFraction<T> operator*(const T val,
 {
     return rhs * val;
 }
+
+// template <typename T, typename U>
+// inline PolynomialFraction<std::common_type_t<T, U>>
+// operator*(const U val, const PolynomialFraction<T> &rhs)
+// {
+//     return rhs * val;
+// }
 
 template <typename T>
 std::ostream &operator<<(std::ostream &os, const PolynomialFraction<T> &frac)
