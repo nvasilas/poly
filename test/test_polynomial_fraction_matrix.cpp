@@ -1,4 +1,4 @@
-#include "../src/matrix_fraction_description.h"
+#include "../src/polynomial_fraction_matrix.h"
 #include "gtest/gtest.h"
 
 using namespace poly;
@@ -158,4 +158,28 @@ TEST(TestPolynomialFractionMatrix, get_left)
                            .finished();
     ASSERT_EQ(Nl, expected_Nl);
     ASSERT_EQ(Dl, expected_Dl);
+}
+
+TEST(TestPolynomialFractionMatrix, get_F)
+{
+    auto mf = (PolynomialFractionMatrix<int>(3, 2)
+                   << PolynomialFractionMatrix<int>{{1}, {2, 1}},
+               PolynomialFractionMatrix<int>{{0}, {1}},
+               PolynomialFractionMatrix<int>{{1}, {3, 1}},
+               PolynomialFractionMatrix<int>{{1}, {-3, 1}},
+               PolynomialFractionMatrix<int>{{1}, {2, -3, 1}},
+               PolynomialFractionMatrix<int>{{0}, {1}})
+                  .finished();
+
+    Matrix<int> expected{/*matrix*/
+                         {(Matrix<int>::EigenMatrix(5, 9) <<
+                           2, 0, 0, 1, 0, 0, 0, 0, 0,  /* 0 row */
+                           0, -9, 0, 0, 0, 0, 0, 1, 0, /* 1 row */
+                           0, 0, 2, 0, 0, -3, 0, 0, 1, /* 2 row */
+                           1, -3, 1, 0, 1, 0, 0, 0, 0, /* 3 row */
+                           0, 3, 0, 0, 1, 0, 0, 0, 0   /* 4 row */
+                           )
+                              .finished()},
+                         /*deg*/ 3};
+    ASSERT_EQ(get_F(mf), expected);
 }

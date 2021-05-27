@@ -1,15 +1,14 @@
 #ifndef POLYNOMIAL_MATRIX_H
 #define POLYNOMIAL_MATRIX_H
 
-#include <Eigen/Dense>
-#include <algorithm>
+#include <Eigen/Core>
 
 #include "polynomial.h"
 
-namespace Eigen {
-template <typename T>
-struct NumTraits<poly::Polynomial<T>> : GenericNumTraits<poly::Polynomial<T>>
+namespace Eigen
 {
+template <typename T>
+struct NumTraits<poly::Polynomial<T>> : GenericNumTraits<poly::Polynomial<T>> {
     using Real = T;
 
     // typedef double Real;
@@ -29,26 +28,27 @@ struct NumTraits<poly::Polynomial<T>> : GenericNumTraits<poly::Polynomial<T>>
 };
 } // namespace Eigen
 
-namespace poly {
-
+namespace poly
+{
 template <typename T>
 using PolynomialMatrix =
     typename Eigen::Matrix<poly::Polynomial<T>, Eigen::Dynamic, Eigen::Dynamic,
                            Eigen::RowMajor>;
 
-template <typename T> struct Matrix
-{
-    using EigenMatrix =
-        typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
+template <typename T> struct Matrix {
+    // using EigenMatrix =
+    //     typename Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic>;
 
     auto rows() const noexcept { return matrix.rows(); }
     auto cols() const noexcept { return matrix.cols(); }
-    auto coef_columns() const noexcept { return matrix.cols() / deg; }
+    auto bcols() const noexcept { return matrix.cols() / deg; }
+
+    auto is_empty() const noexcept { return !matrix.size(); }
 
     auto &operator()(int row, int col) { return matrix(row, col); }
     const auto &operator()(int row, int col) const { return matrix(row, col); }
 
-    EigenMatrix matrix;
+    Eigen::Matrix<T, Eigen::Dynamic, Eigen::Dynamic> matrix;
     std::size_t deg;
 };
 
@@ -126,6 +126,5 @@ auto to_coeff_matrix(const PolynomialMatrix<T> &poly_matrix)
     }
     return ret;
 }
-
 } // namespace poly
 #endif // POLYNOMIAL_MATRIX_H
